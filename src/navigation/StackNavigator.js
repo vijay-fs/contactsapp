@@ -9,9 +9,29 @@ const Stack = createStackNavigator();
 const StackNavigator = () => {
   return (
     <Stack.Navigator initialRouteName="ContactList">
-      <Stack.Screen name="ContactList" component={ContactListScreen} />
-      <Stack.Screen name="AddContact" component={AddContactScreen} />
-      <Stack.Screen name="ContactDetails" component={ContactDetailsScreen} />
+      <Stack.Screen
+        name="ContactList"
+        component={ContactListScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="AddContact"
+        component={AddContactScreen}
+        options={{
+          headerTitleStyle: {
+            display: "none",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="ContactDetails"
+        component={ContactDetailsScreen}
+        options={{
+          headerTitle: "Contact Details",
+        }}
+      />
     </Stack.Navigator>
   );
 };

@@ -26,13 +26,11 @@ export const addContactRequest = (contactData) => ({
   payload: contactData,
 });
 
-// Update Contact
 export const updateContactRequest = (contactId, contactData) => ({
   type: UPDATE_CONTACT_REQUEST,
   payload: { contactId, contactData },
 });
 
-// Delete Contact
 export const deleteContactRequest = (contactId) => ({
   type: DELETE_CONTACT_REQUEST,
   payload: contactId,
