@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import { deleteContactRequest, getContactsList } from "../../actions"; // Import necessary actions from the actions file
 import {
@@ -9,22 +9,37 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
-import { useNavigation, useIsFocused } from "@react-navigation/native";
+import {
+  useNavigation,
+  useIsFocused,
+  useFocusEffect,
+} from "@react-navigation/native";
 import { Avatar, Icon } from "@rneui/base";
 
 const ContactListScreen = ({ route }) => {
+  const Focused = useIsFocused();
   const navigation = useNavigation(); // Get the navigation object for navigating between screens
-  const isFocused = useIsFocused(); // Check if the screen is currently focused
   const dispatch = useDispatch(); // Get access to the Redux dispatch function to trigger actions
-  const contacts = useSelector((state) => state.getContacts.contacts); // Get the contacts from the Redux store
+  const contactsFromRedux = useSelector((state) => state.getContacts.contacts);
 
+  const [Contacts, setContacts] = useState(contactsFromRedux || []);
+
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     // Dispatch the action and update state when the screen is focused
+  //     dispatch(getContactsList());
+  //     setContacts(contactsFromRedux);
+  //   }, [dispatch, Focused]) // Depend on isFocused to re-run the effect when the screen is focused
+  // );
   useEffect(() => {
-    // Use useEffect to trigger actions when the component mounts or when it is focused
-    dispatch(getContactsList()); // Dispatch the action to fetch contacts when the component mounts or is focused
-  }, [isFocused]); // Depend on isFocused so that the action is re-triggered when the screen becomes focused again
+    // Dispatch the action and update state when the screen is focused
+    dispatch(getContactsList());
+    setContacts(contactsFromRedux);
+  }, [dispatch, Focused]); // Depend on isFocused to re-run the effect when the screen is focused
 
   const renderItem = ({ item }) => (
     // Render each contact item in the list
+
     <TouchableOpacity
       style={styles.itemContainer}
       onPress={() => {
@@ -59,15 +74,15 @@ const ContactListScreen = ({ route }) => {
     <>
       <View style={styles.container}>
         <Text style={styles.header}>Contact List</Text>
-        {contacts.length === 0 ? (
+        {Contacts.length === 0 ? (
           // Show an activity indicator while contacts are loading
           <ActivityIndicator size="large" style={styles.loadingIndicator} />
         ) : (
           // Render the FlatList with contacts when available
           <FlatList
-            data={contacts}
+            data={Contacts}
             renderItem={renderItem}
-            keyExtractor={(item) => item._id}
+            keyExtractor={(item, i) => i}
           />
         )}
       </View>

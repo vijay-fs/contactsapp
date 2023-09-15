@@ -55,6 +55,27 @@ const AddContactScreen = (props) => {
 
     setImageBase64(result.assets[0].base64); // Set the captured image as base64
   };
+  const openImagePicker = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission Required",
+        "Please grant permission to access your photo library."
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      base64: true, // Capture the selected image as base64
+    });
+
+    if (!result.cancelled) {
+      setImageBase64(result.assets[0].base64); // Set the selected image as base64
+    }
+  };
 
   const addContact = () => {
     // Basic input validation
@@ -90,7 +111,7 @@ const AddContactScreen = (props) => {
         <View style={styles.imageContainer}>
           {imageBase64 ? (
             <TouchableOpacity
-              onPress={openCamera}
+              onPress={openImagePicker}
               style={styles.touchableImageContainer}
             >
               <Image
@@ -100,7 +121,7 @@ const AddContactScreen = (props) => {
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
-              onPress={openCamera}
+              onPress={openImagePicker}
               style={{
                 backgroundColor: "#9315fa",
                 padding: 15,

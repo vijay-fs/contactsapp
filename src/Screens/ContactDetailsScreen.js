@@ -66,28 +66,25 @@ const ContactDetailsScreen = ({ route }) => {
     setEditMode(true); // Enable edit mode
   };
 
-  const openCamera = async () => {
-    if (!hasPermission) {
-      // Check and request camera permissions
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      if (status === "granted") {
-        const result = await ImagePicker.launchCameraAsync({
-          allowsEditing: true,
-          aspect: [4, 3],
-          base64: true, // Capture the image as base64
-        });
+  const openImagePicker = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-        if (result.canceled) {
-          return;
-        }
-        setUpdatedImage(result.assets[0].base64); // Set the captured image as base64
-      } else {
-        Alert.alert(
-          "Camera Permission",
-          "Camera permission is required to take photos."
-        );
-        return;
-      }
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission Required",
+        "Please grant permission to access your photo library."
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      base64: true, // Capture the selected image as base64
+    });
+
+    if (!result.cancelled) {
+      setUpdatedImage(result.assets[0].base64); // Set the selected image as base64
     }
   };
 
@@ -104,21 +101,23 @@ const ContactDetailsScreen = ({ route }) => {
           }}
         >
           {updatedImage ? (
-            <Image
-              source={{
-                uri: `data:image/jpeg;base64,${updatedImage}`,
-              }}
-              style={{
-                width: 200,
-                height: 200,
-                borderRadius: 100,
-                alignSelf: "center",
-                marginBottom: 60,
-              }}
-            />
+            <TouchableOpacity onPress={openImagePicker}>
+              <Image
+                source={{
+                  uri: `data:image/jpeg;base64,${updatedImage}`,
+                }}
+                style={{
+                  width: 200,
+                  height: 200,
+                  borderRadius: 100,
+                  alignSelf: "center",
+                  marginBottom: 60,
+                }}
+              />
+            </TouchableOpacity>
           ) : (
             <TouchableOpacity
-              onPress={openCamera}
+              onPress={openImagePicker}
               style={{
                 backgroundColor: "#9315fa",
                 padding: 15,
@@ -296,6 +295,25 @@ const ContactDetailsScreen = ({ route }) => {
           />
         )}
       </View>
+      <Chip
+        onPress={
+          () => navigation.navigate("BusinessCardScanner") // Navigate to the BusinessCardScanner screen when the button is pressed
+        }
+        title="Business Card Scanner"
+        icon={{
+          name: "address-card",
+          type: "font-awesome",
+          size: 20,
+          color: "white",
+        }}
+        color={"#9315fa"}
+        iconRight
+        containerStyle={{
+          marginVertical: 15,
+          width: "60%",
+          alignSelf: "center",
+        }}
+      />
     </ScrollView>
   );
 };
